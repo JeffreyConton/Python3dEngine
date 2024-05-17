@@ -15,13 +15,8 @@ class Renderer:
             obj.draw()
 
 class Object3D:
-    def __init__(self, vertices, edges):
-        self.vertices = vertices
-        self.edges = edges
+    def __init__(self):
+        pass
 
     def draw(self):
-        glBegin(GL_LINES)
-        for edge in self.edges:
-            for vertex in edge:
-                glVertex3fv(self.vertices[vertex])
-        glEnd()
+        pass
