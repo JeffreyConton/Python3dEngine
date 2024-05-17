@@ -1,8 +1,7 @@
 import numpy as np
 from noise import pnoise2
-from OpenGL.GL import *
-from math import sin, cos
 import random
+from OpenGL.GL import *
 
 class Terrain:
     def __init__(self, width, height, resolution, seed=None):
@@ -30,8 +29,7 @@ class Terrain:
         persistence = 0.4
         lacunarity = 2.0
 
-        height_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
-        gradient_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
+        self.height_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
 
         for z in range(self.height * self.resolution):
             for x in range(self.width * self.resolution):
@@ -43,29 +41,11 @@ class Terrain:
                     y += pnoise2(x * frequency, z * frequency) * amplitude
                     amplitude *= persistence
                     frequency *= lacunarity
-                height_map[z][x] = y
-
-        for z in range(1, self.height * self.resolution - 1):
-            for x in range(1, self.width * self.resolution - 1):
-                height_center = height_map[z][x]
-                height_right = height_map[z][x + 1]
-                height_left = height_map[z][x - 1]
-                height_up = height_map[z + 1][x]
-                height_down = height_map[z - 1][x]
-
-                gradient_x = (height_right - height_left) / 2
-                gradient_z = (height_up - height_down) / 2
-                gradient = np.sqrt(gradient_x ** 2 + gradient_z ** 2)
-
-                gradient_map[z][x] = gradient
-
-        max_gradient = np.max(gradient_map)
+                self.height_map[z][x] = y
 
         for z in range(self.height * self.resolution):
             for x in range(self.width * self.resolution):
-                y = height_map[z][x]
-                gradient = gradient_map[z][x]
-                y *= 1 - (gradient / max_gradient) ** 2  # Gradient trick to smooth the heights
+                y = self.height_map[z][x]
                 vertices.append((x / self.resolution, y, z / self.resolution))
                 color = self.random_pastel_color()
                 colors.append(color)
@@ -115,3 +95,11 @@ class Terrain:
     def get_bounding_box(self):
         # Return the min and max coordinates for x, y, z
         return 0, -5, 0, self.width, 5, self.height
+
+    def get_height(self, x, z):
+        # Get the height of the terrain at the given (x, z) position
+        ix = int(x * self.resolution)
+        iz = int(z * self.resolution)
+        if 0 <= ix < self.width * self.resolution and 0 <= iz < self.height * self.resolution:
+            return self.height_map[iz][ix]
+        return 0.0
