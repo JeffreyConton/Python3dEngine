@@ -43,10 +43,14 @@ class Terrain:
                     frequency *= lacunarity
                 self.height_map[z][x] = y
 
+        half_width = (self.width * self.resolution) / 2.0
+        half_height = (self.height * self.resolution) / 2.0
+
         for z in range(self.height * self.resolution):
             for x in range(self.width * self.resolution):
                 y = self.height_map[z][x]
-                vertices.append((x / self.resolution, y, z / self.resolution))
+                # Scale and center the vertices
+                vertices.append(((x - half_width) / self.resolution, y, (z - half_height) / self.resolution))
                 color = self.random_pastel_color()
                 colors.append(color)
 
@@ -98,8 +102,8 @@ class Terrain:
 
     def get_height(self, x, z):
         # Get the height of the terrain at the given (x, z) position
-        ix = int(x * self.resolution)
-        iz = int(z * self.resolution)
+        ix = int((x + (self.width / 2)) * self.resolution)
+        iz = int((z + (self.height / 2)) * self.resolution)
         if 0 <= ix < self.width * self.resolution and 0 <= iz < self.height * self.resolution:
             return self.height_map[iz][ix]
         return 0.0

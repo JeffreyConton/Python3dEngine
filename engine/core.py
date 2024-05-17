@@ -7,7 +7,7 @@ class Core:
     def __init__(self, width, height):
         self.width = width
         self.height = height
-        self.camera_position = np.array([0.0, 5.0, 0.0], dtype=np.float32)
+        self.camera_position = np.array([0.0, 1.0, 0.0], dtype=np.float32)  # Start at (0, 0, 0) with height 1
         self.camera_rotation = np.array([0.0, 0.0], dtype=np.float32)  # pitch, yaw
         self.movement_speed = 0.1
         self.mouse_sensitivity = 0.1
