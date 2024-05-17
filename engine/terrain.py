@@ -16,10 +16,14 @@ class Terrain:
         colors = []
         indices = []
 
+        frequency = random.uniform(0.1, 0.3)
+        amplitude = random.uniform(1.0, 5.0)
+        octaves = random.randint(1, 5)
+
         for z in range(self.height):
             for x in range(self.width):
-                # Generate a cool wave pattern for terrain height
-                y = sin(x * 0.2) * cos(z * 0.2) * 5  # Adjusted for a more interesting pattern
+                # Generate height using stacked Perlin noise
+                y = pnoise2(x * frequency, z * frequency, octaves) * amplitude
                 vertices.append((x, y, z))
                 color = self.random_pastel_color()
                 colors.append(color)
