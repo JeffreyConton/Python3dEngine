@@ -5,9 +5,10 @@ from math import sin, cos
 import random
 
 class Terrain:
-    def __init__(self, width, height):
+    def __init__(self, width, height, resolution):
         self.width = width
         self.height = height
+        self.resolution = resolution
         self.vertices, self.colors, self.indices = self.generate_terrain()
         print("Terrain: Initialized")
 
@@ -20,19 +21,19 @@ class Terrain:
         amplitude = random.uniform(1.0, 5.0)
         octaves = random.randint(1, 5)
 
-        for z in range(self.height):
-            for x in range(self.width):
+        for z in range(self.height * self.resolution):
+            for x in range(self.width * self.resolution):
                 # Generate height using stacked Perlin noise
-                y = pnoise2(x * frequency, z * frequency, octaves) * amplitude
-                vertices.append((x, y, z))
+                y = pnoise2(x * frequency / self.resolution, z * frequency / self.resolution, octaves) * amplitude
+                vertices.append((x / self.resolution, y, z / self.resolution))
                 color = self.random_pastel_color()
                 colors.append(color)
 
-        for z in range(self.height - 1):
-            for x in range(self.width - 1):
-                top_left = z * self.width + x
+        for z in range(self.height * self.resolution - 1):
+            for x in range(self.width * self.resolution - 1):
+                top_left = z * self.width * self.resolution + x
                 top_right = top_left + 1
-                bottom_left = top_left + self.width
+                bottom_left = top_left + self.width * self.resolution
                 bottom_right = bottom_left + 1
 
                 indices.append(top_left)
