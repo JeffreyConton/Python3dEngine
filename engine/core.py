@@ -39,13 +39,13 @@ class Core:
         keys = pygame.key.get_pressed()
         movement = np.array([0.0, 0.0, 0.0], dtype=np.float32)
         if keys[pygame.K_w]:
-            movement[2] -= self.movement_speed
+            movement[2] += self.movement_speed  # Changed from -= to +=
         if keys[pygame.K_s]:
-            movement[2] += self.movement_speed
+            movement[2] -= self.movement_speed  # Changed from += to -=
         if keys[pygame.K_a]:
-            movement[0] -= self.movement_speed
+            movement[0] += self.movement_speed  # Changed from -= to +=
         if keys[pygame.K_d]:
-            movement[0] += self.movement_speed
+            movement[0] -= self.movement_speed  # Changed from += to -=
         if keys[pygame.K_SPACE] and self.on_ground:
             self.vertical_velocity = self.jump_speed
             self.on_ground = False
