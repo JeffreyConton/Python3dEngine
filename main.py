@@ -13,7 +13,7 @@ def main():
     print("Renderer initialized")
 
     # Increase resolution by setting a higher value
-    resolution = 5
+    resolution = 10  # Increased resolution for more detail
     seed = 42  # Fixed seed for reproducibility
     terrain = Terrain(50, 50, resolution, seed)
     print("Terrain initialized")
