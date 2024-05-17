@@ -5,10 +5,11 @@ from math import sin, cos
 import random
 
 class Terrain:
-    def __init__(self, width, height, resolution):
+    def __init__(self, width, height, resolution, seed=None):
         self.width = width
         self.height = height
         self.resolution = resolution
+        self.seed = seed
         self.vertices, self.colors, self.indices = self.generate_terrain()
         print("Terrain: Initialized")
 
@@ -16,6 +17,10 @@ class Terrain:
         vertices = []
         colors = []
         indices = []
+
+        # Set the seed for reproducibility
+        if self.seed is not None:
+            random.seed(self.seed)
 
         frequency = random.uniform(0.1, 0.3)
         amplitude = random.uniform(1.0, 5.0)

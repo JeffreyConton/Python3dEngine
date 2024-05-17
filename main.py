@@ -14,7 +14,8 @@ def main():
 
     # Increase resolution by setting a higher value
     resolution = 5
-    terrain = Terrain(50, 50, resolution)
+    seed = 42  # Fixed seed for reproducibility
+    terrain = Terrain(50, 50, resolution, seed)
     print("Terrain initialized")
     renderer.add_object(terrain)
 
@@ -29,12 +30,12 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     mouse_grabbed = not mouse_grabbed
                     pygame.event.set_grab(mouse_grabbed)
-                    pygame.mouse.set_visible(mouse_grabbed)
+                    pygame.mouse.set_visible(not mouse_grabbed)
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if not mouse_grabbed:
                     mouse_grabbed = True
                     pygame.event.set_grab(mouse_grabbed)
-                    pygame.mouse.set_visible(mouse_grabbed)
+                    pygame.mouse.set_visible(not mouse_grabbed)
 
         if mouse_grabbed:
             core.handle_input()
