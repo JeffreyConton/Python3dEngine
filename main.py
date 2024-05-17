@@ -16,7 +16,7 @@ def main():
     # Increase resolution by setting a higher value
     resolution = 10  # Increased resolution for more detail
     seed = 42  # Fixed seed for reproducibility
-    terrain = Terrain(50, 50, resolution, seed)
+    terrain = Terrain(100, 100, resolution, seed)
     core.terrain = terrain  # Pass the terrain to Core
     print("Terrain initialized")
     renderer.add_object(terrain)
