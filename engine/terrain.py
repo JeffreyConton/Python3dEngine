@@ -23,20 +23,26 @@ class Terrain:
             random.seed(self.seed)
             np.random.seed(self.seed)
 
-        frequency = 0.1
-        amplitude = 1.0
-        octaves = 6
+        # Parameters for Perlin noise
+        base_frequency = 0.01
+        base_amplitude = 3.0
+        octaves = 4
+        persistence = 0.4
+        lacunarity = 2.0
 
         height_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
         gradient_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
 
         for z in range(self.height * self.resolution):
             for x in range(self.width * self.resolution):
+                # Fractal Perlin noise
                 y = 0
+                amplitude = base_amplitude
+                frequency = base_frequency
                 for o in range(octaves):
-                    freq = frequency * (2 ** o)
-                    amp = amplitude * (0.5 ** o)
-                    y += pnoise2(x * freq / self.resolution, z * freq / self.resolution) * amp
+                    y += pnoise2(x * frequency, z * frequency) * amplitude
+                    amplitude *= persistence
+                    frequency *= lacunarity
                 height_map[z][x] = y
 
         for z in range(1, self.height * self.resolution - 1):
