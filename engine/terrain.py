@@ -10,98 +10,60 @@ class Terrain:
         self.resolution = resolution
         self.seed = seed
         self.vertices, self.colors, self.indices = self.generate_terrain()
-        print("Terrain: Initialized")
 
     def generate_terrain(self):
-        vertices = []
-        colors = []
-        indices = []
-
-        # Set the seed for reproducibility
         if self.seed is not None:
             random.seed(self.seed)
             np.random.seed(self.seed)
 
-        # Parameters for Perlin noise
         base_frequency = 0.01
         base_amplitude = 3.0
         octaves = 4
         persistence = 0.4
         lacunarity = 2.0
 
-        self.height_map = np.zeros((self.height * self.resolution, self.width * self.resolution))
+        width_res = self.width * self.resolution
+        height_res = self.height * self.resolution
 
-        for z in range(self.height * self.resolution):
-            for x in range(self.width * self.resolution):
-                # Fractal Perlin noise
-                y = 0
-                amplitude = base_amplitude
-                frequency = base_frequency
-                for o in range(octaves):
-                    y += pnoise2(x * frequency, z * frequency) * amplitude
-                    amplitude *= persistence
-                    frequency *= lacunarity
-                self.height_map[z][x] = y
+        height_map = np.zeros((height_res, width_res), dtype=np.float32)
+        for z in range(height_res):
+            for x in range(width_res):
+                y = sum(pnoise2(x * base_frequency * lacunarity**o, z * base_frequency * lacunarity**o) * base_amplitude * persistence**o for o in range(octaves))
+                height_map[z, x] = y
 
-        half_width = (self.width * self.resolution) / 2.0
-        half_height = (self.height * self.resolution) / 2.0
+        half_width = width_res / 2.0
+        half_height = height_res / 2.0
 
-        for z in range(self.height * self.resolution):
-            for x in range(self.width * self.resolution):
-                y = self.height_map[z][x]
-                # Scale and center the vertices
-                vertices.append(((x - half_width) / self.resolution, y, (z - half_height) / self.resolution))
-                color = self.random_pastel_color()
-                colors.append(color)
+        vertices = np.array([((x - half_width) / self.resolution, height_map[z, x], (z - half_height) / self.resolution) for z in range(height_res) for x in range(width_res)], dtype=np.float32)
+        colors = np.array([self.random_pastel_color() for _ in range(height_res * width_res)], dtype=np.float32)
+        indices = []
 
-        for z in range(self.height * self.resolution - 1):
-            for x in range(self.width * self.resolution - 1):
-                top_left = z * self.width * self.resolution + x
+        for z in range(height_res - 1):
+            for x in range(width_res - 1):
+                top_left = z * width_res + x
                 top_right = top_left + 1
-                bottom_left = top_left + self.width * self.resolution
+                bottom_left = top_left + width_res
                 bottom_right = bottom_left + 1
+                indices.extend([top_left, bottom_left, top_right, top_right, bottom_left, bottom_right])
 
-                indices.append(top_left)
-                indices.append(bottom_left)
-                indices.append(top_right)
-
-                indices.append(top_right)
-                indices.append(bottom_left)
-                indices.append(bottom_right)
-
-        print("Terrain: Vertices, colors, and indices generated")
-        return np.array(vertices, dtype=np.float32), np.array(colors, dtype=np.float32), np.array(indices, dtype=np.uint32)
+        self.height_map = height_map  # Save the height map for collision detection
+        return vertices, colors, np.array(indices, dtype=np.uint32)
 
     def random_pastel_color(self):
-        # Generate random pastel colors
-        r = (random.random() + 1) / 2
-        g = (random.random() + 1) / 2
-        b = (random.random() + 1) / 2
-        return [r, g, b, 1]
+        return [(random.random() + 1) / 2 for _ in range(3)] + [1]
 
     def draw(self):
-        glShadeModel(GL_FLAT)  # Enable flat shading
-
+        glShadeModel(GL_FLAT)
         glEnableClientState(GL_VERTEX_ARRAY)
         glEnableClientState(GL_COLOR_ARRAY)
-
         glVertexPointer(3, GL_FLOAT, 0, self.vertices)
         glColorPointer(4, GL_FLOAT, 0, self.colors)
-
         glDrawElements(GL_TRIANGLES, len(self.indices), GL_UNSIGNED_INT, self.indices)
-
         glDisableClientState(GL_COLOR_ARRAY)
         glDisableClientState(GL_VERTEX_ARRAY)
-
-        glShadeModel(GL_SMOOTH)  # Reset to smooth shading after drawing
-        print("Terrain: Drawn")
-
-    def get_bounding_box(self):
-        # Return the min and max coordinates for x, y, z
-        return 0, -5, 0, self.width, 5, self.height
+        glShadeModel(GL_SMOOTH)
 
     def get_height(self, x, z):
-        # Get the height of the terrain at the given (x, z) position
         ix = int((x + (self.width / 2)) * self.resolution)
         iz = int((z + (self.height / 2)) * self.resolution)
         if 0 <= ix < self.width * self.resolution and 0 <= iz < self.height * self.resolution:

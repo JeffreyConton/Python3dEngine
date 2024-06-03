@@ -5,25 +5,21 @@ import pygame
 import time
 from OpenGL.GL import *
 
+
 def main():
     width, height = 800, 600
     core = Core(width, height)
-    print("Core initialized")
-
     renderer = Renderer()
-    print("Renderer initialized")
 
-    # Increase resolution by setting a higher value
-    resolution = 10  # Increased resolution for more detail
-    seed = 42  # Fixed seed for reproducibility
+    resolution = 10
+    seed = 42
     terrain = Terrain(100, 100, resolution, seed)
-    core.terrain = terrain  # Pass the terrain to Core
-    print("Terrain initialized")
+    core.terrain = terrain
     renderer.add_object(terrain)
 
-    print("Starting main loop")
     running = True
     mouse_grabbed = True
+    clock = pygame.time.Clock()
 
     while running:
         for event in pygame.event.get():
@@ -42,16 +38,19 @@ def main():
 
         if mouse_grabbed:
             core.handle_input()
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)  # Clear the screen and depth buffer
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             core.update_camera()
             renderer.render(core)
-            pygame.display.flip()  # Update the display
-            print("Frame rendered")
+            pygame.display.flip()
 
-        time.sleep(0.01)  # Add a small delay to avoid high CPU usage
+            # Debugging information
+            fps = clock.get_fps()
+            print(f"FPS: {fps:.2f}, Vertices: {terrain.vertices.shape[0]}, Faces: {len(terrain.indices) // 3}")
+
+        clock.tick(60)  # Cap the frame rate at 60 FPS
 
     pygame.quit()
-    print("Program terminated")
+
 
 if __name__ == "__main__":
     main()
